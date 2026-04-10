@@ -1,0 +1,22 @@
+{
+  "name": "Joy - עוזרת חכמה",
+  "short_name": "Joy",
+  "description": "Joy - גאונית מחשבים, האקרית ויועצת אישית",
+  "start_url": "/joy.html",
+  "display": "standalone",
+  "background_color": "#0f0f1a",
+  "theme_color": "#534AB7",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "joy_avatar.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "joy_avatar.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}

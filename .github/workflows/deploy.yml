@@ -9,8 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Inject API key
-        run: sed -i "s/YOUR_ANTHROPIC_API_KEY_HERE/${{ secrets.ANTHROPIC_KEY }}/g" joy.html
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
         with:

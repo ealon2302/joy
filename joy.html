@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="en" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
+  <title>טוי / Joy - עוזרת חכמה</title>
+  <meta name="theme-color" content="#534AB7" />
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      max-width: 100vw;
+      overflow-x: hidden;
+    }
+
+    :root {
+      --bg:         #0f0f1a;
+      --bg2:        #13131f;
+      --bg3:        #1a1a2e;
+      --bg4:        #1e1e30;
+      --bg5:        #0d0d1a;
+      --border:     #2a2a3e;
+      --border2:    #3a3a5a;
+      --text:       #f0f0f0;
+      --text2:      #e8e8f0;
+      --text3:      #8a8aaa;
+      --text4:      #5a5a7a;
+    }
+
+    html.light {
+      --bg:         #f2f2f7;
+      --bg2:        #e5e5ea;
+      --bg3:        #ffffff;
+      --bg4:        #f8f8ff;
+      --bg5:        #ebebf0;
+      --border:     #d1d1d6;
+      --border2:    #b0b0c0;
+      --text:       #1a1a2e;
+      --text2:      #2a2a3e;
+      --text3:      #6a6a8a;
+      --text4:      #9a9ab0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100%;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    html {
+      height: 100%;
+      background: var(--bg);
+    }
+
+    #header {
+      padding: 12px 16px;
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    #avatar-img {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #534AB7;
+      flex-shrink: 0;
+    }
+
+    #avatar-fallback {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #534AB7, #D4537E);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 600;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    #header-info { flex: 1; }
+
+    #header-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    #header-status {
+      font-size: 12px;
+      color: var(--text3);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 1px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #1D9E75;
+    }
+
+    #header-actions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    #voice-btn {
+      background: none;
+      border: 1px solid #3a3a5a;
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: 16px;
+      cursor: pointer;
+      opacity: 0.5;
+      transition: all 0.15s;
+      color: white;
+    }
+    #voice-btn:hover { opacity: 0.8; }
+    #voice-btn.on { opacity: 1; border-color: #D4537E; }
+
+    #theme-btn {
+      background: none;
+      border: 1px solid var(--border2);
+      border-radius: 20px;
+      padding: 5px 10px;
+      font-size: 15px;
+      cursor: pointer;
+      opacity: 0.6;
+      transition: all 0.15s;
+      color: var(--text);
+    }
+    #theme-btn:hover { opacity: 1; }
+
+    #settings-btn {
+      background: none;
+      border: 1px solid var(--border2);
+      border-radius: 20px;
+      padding: 5px 10px;
+      font-size: 15px;
+      cursor: pointer;
+      opacity: 0.5;
+      transition: all 0.15s;
+      color: var(--text);
+    }
+    #settings-btn:hover { opacity: 0.8; }
+
+    #mode-bar {
+      padding: 8px 12px;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      flex-shrink: 0;
+      scrollbar-width: none;
+    }
+    #mode-bar::-webkit-scrollbar { display: none; }
+
+    .mode-btn {
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid #3a3a5a;
+      background: transparent;
+      font-size: 13px;
+      color: #8a8aaa;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .mode-btn.active { background: #534AB7; color: #fff; border-color: #534AB7; }
+    .mode-btn:hover:not(.active) { background: var(--bg4); color: var(--text2); }
+
+    #messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      scrollbar-width: thin;
+      scrollbar-color: #3a3a5a transparent;
+    }
+
+    .msg { display: flex; flex-direction: column; gap: 3px; max-width: 80%; }
+    .msg.joy { align-self: flex-start; }
+    .msg.user { align-self: flex-end; }
+
+    .joy-row { display: flex; align-items: flex-end; gap: 8px; }
+
+    .mini-av {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .msg-inner { display: flex; flex-direction: column; gap: 3px; }
+
+    .mode-tag {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 600;
+      width: fit-content;
+    }
+    .tag-chat    { background: #2d2560; color: #b8b0ff; }
+    .tag-code    { background: #0d3325; color: #5de8a5; }
+    .tag-advisor { background: #332a10; color: #f5c875; }
+    .tag-tasks   { background: #0d2540; color: #75b8f5; }
+
+    .bubble {
+      padding: 10px 14px;
+      border-radius: 18px;
+      font-size: 14px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .joy .bubble { background: var(--bg4); color: var(--text2); border-bottom-left-radius: 4px; }
+    .user .bubble { background: #534AB7; color: #fff; border-bottom-right-radius: 4px; }
+
+    .msg-time { font-size: 10px; color: #5a5a7a; padding: 0 4px; }
+    .joy .msg-time { align-self: flex-start; }
+    .user .msg-time { align-self: flex-end; }
+
+    .typing-bubble {
+      background: var(--bg4);
+      padding: 12px 16px;
+      border-radius: 18px;
+      border-bottom-left-radius: 4px;
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+    .typing-bubble span {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--text4);
+      animation: bounce 1.2s infinite;
+    }
+    .typing-bubble span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-bubble span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce {
+      0%,80%,100% { transform: translateY(0); }
+      40% { transform: translateY(-6px); }
+    }
+
+    #input-area {
+      padding: 8px 12px;
+      padding-bottom: max(10px, env(safe-area-inset-bottom));
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex-shrink: 0;
+      width: 100vw;
+      max-width: 100vw;
+      overflow: hidden;
+    }
+
+    #input-row {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 8px;
+    }
+
+    #user-input {
+      width: 100%;
+      background: var(--bg4);
+      border: 1px solid var(--border2);
+      border-radius: 22px;
+      padding: 10px 16px;
+      font-size: 14px;
+      color: var(--text2);
+      resize: none;
+      max-height: 120px;
+      outline: none;
+      font-family: inherit;
+      line-height: 1.5;
+    }
+    #user-input:focus { border-color: #534AB7; }
+    #user-input::placeholder { color: var(--text4); }
+
+    #send-btn {
+      width: 100%;
+      height: 38px;
+      border-radius: 20px;
+      background: #534AB7;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+    #send-btn:hover { background: #6a60d0; }
+    #send-btn:disabled { opacity: 0.4; cursor: default; }
+
+    .speaking { animation: pulse 1s infinite; }
+
+    /* ===== SIDEBAR ===== */
+    #sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 200;
+      backdrop-filter: blur(2px);
+    }
+    #sidebar-overlay.open { display: block; }
+
+    #sidebar {
+      position: fixed;
+      top: 0;
+      right: -280px;
+      width: 280px;
+      height: 100%;
+      background: var(--bg3);
+      border-left: 1px solid var(--border);
+      z-index: 201;
+      display: flex;
+      flex-direction: column;
+      transition: right 0.25s ease;
+    }
+    #sidebar.open { right: 0; }
+
+    #sidebar-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    #sidebar-header h3 { font-size: 15px; color: var(--text); font-weight: 600; }
+
+    #new-chat-btn {
+      background: #534AB7;
+      border: none;
+      border-radius: 10px;
+      padding: 7px 12px;
+      font-size: 13px;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: background 0.15s;
+    }
+    #new-chat-btn:hover { background: #6a60d0; }
+
+    #conversations-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      scrollbar-width: thin;
+    }
+
+    .conv-item {
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.15s;
+      position: relative;
+    }
+    .conv-item:hover { background: var(--bg4); }
+    .conv-item.active { background: var(--bg4); border: 1px solid var(--border2); }
+
+    .conv-title {
+      flex: 1;
+      font-size: 13px;
+      color: var(--text2);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .conv-date {
+      font-size: 10px;
+      color: var(--text4);
+      flex-shrink: 0;
+    }
+    .conv-delete {
+      display: none;
+      background: none;
+      border: none;
+      color: #D4537E;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 2px 4px;
+      flex-shrink: 0;
+    }
+    .conv-item:hover .conv-delete { display: block; }
+
+    #sidebar-btn {
+      background: none;
+      border: 1px solid var(--border2);
+      border-radius: 20px;
+      padding: 5px 10px;
+      font-size: 15px;
+      cursor: pointer;
+      opacity: 0.6;
+      transition: all 0.15s;
+      color: var(--text);
+    }
+    #sidebar-btn:hover { opacity: 1; }
+    @keyframes pulse {
+      0%,100% { border-color: #534AB7; }
+      50% { border-color: #D4537E; box-shadow: 0 0 12px #D4537E88; }
+    }
+
+    .bubble pre {
+      background: var(--bg5);
+      border-radius: 8px;
+      padding: 10px;
+      margin-top: 8px;
+      overflow-x: auto;
+      font-size: 12px;
+      font-family: 'Courier New', monospace;
+      border: 1px solid var(--border);
+    }
+    .bubble code { font-family: 'Courier New', monospace; font-size: 13px; }
+
+    /* ===== MODAL ===== */
+    #modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    #modal-overlay.open { display: flex; }
+
+    #modal {
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: 20px;
+      padding: 28px 24px;
+      width: min(360px, 90vw);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    #modal h2 {
+      font-size: 18px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #modal p {
+      font-size: 13px;
+      color: #8a8aaa;
+      line-height: 1.6;
+    }
+
+    #modal a {
+      color: #9b8fff;
+      text-decoration: none;
+    }
+    #modal a:hover { text-decoration: underline; }
+
+    #model-select {
+      width: 100%;
+      background: #0f0f1a;
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 14px;
+      color: var(--text2);
+      outline: none;
+      font-family: inherit;
+      direction: rtl;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238a8aaa' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: left 14px center;
+    }
+
+    #api-key-input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 14px;
+      color: #e8e8f0;
+      outline: none;
+      font-family: 'Courier New', monospace;
+      direction: ltr;
+      text-align: left;
+    }
+    #api-key-input:focus { border-color: #534AB7; }
+    #api-key-input::placeholder { color: #5a5a7a; font-family: inherit; }
+
+    #modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .btn-clear {
+      padding: 9px 14px;
+      border-radius: 12px;
+      border: 1px solid #D4537E44;
+      background: transparent;
+      color: #D4537E;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s;
+      margin-right: auto;
+    }
+    .btn-clear:hover { background: #D4537E22; }
+
+    .btn-cancel {
+      padding: 9px 18px;
+      border-radius: 12px;
+      border: 1px solid #3a3a5a;
+      background: transparent;
+      color: #8a8aaa;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-cancel:hover { background: var(--bg4); color: var(--text2); }
+
+    .btn-save {
+      padding: 9px 18px;
+      border-radius: 12px;
+      border: none;
+      background: #534AB7;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-save:hover { background: #6a60d0; }
+
+    #modal-error {
+      font-size: 12px;
+      color: #D4537E;
+      display: none;
+    }
+
+    /* key status badge */
+    #key-status {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      margin-right: auto;
+    }
+    #key-status.ok { background: #0d3325; color: #5de8a5; }
+    #key-status.missing { background: #3a1020; color: #D4537E; }
+  </style>
+</head>
+<body>
+
+<div id="header">
+  <img id="avatar-img" src="joy_avatar.jpg" alt="Joy"
+       onerror="this.style.display='none'; document.getElementById('avatar-fallback').style.display='flex';" />
+  <div id="avatar-fallback">J</div>
+  <div id="header-info">
+    <div id="header-name">טוי / Joy</div>
+    <div id="header-status">
+      <span class="status-dot"></span>
+      <span id="mode-label">מצב חברותי</span>
+    </div>
+  </div>
+  <div id="header-actions">
+    <button id="voice-btn" onclick="toggleVoice()" title="הפעל קול">🔇</button>
+    <button id="sidebar-btn" onclick="toggleSidebar()" title="שיחות">☰</button>
+    <button id="theme-btn" onclick="toggleTheme()" title="מצב תצוגה">🌙</button>
+    <button id="settings-btn" onclick="openSettings()" title="הגדרות">⚙️</button>
+  </div>
+</div>
+
+<div id="mode-bar">
+  <button class="mode-btn active" data-mode="chat">💬 שיחה חופשית</button>
+  <button class="mode-btn" data-mode="code">💻 עוזרת קוד</button>
+  <button class="mode-btn" data-mode="advisor">🧠 יועצת</button>
+  <button class="mode-btn" data-mode="tasks">✅ משימות</button>
+</div>
+
+<div id="messages"></div>
+
+<div id="input-area">
+  <textarea id="user-input" placeholder="כתוב הודעה..." rows="1"></textarea>
+  <button id="send-btn" aria-label="שלח">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+      <path d="M22 2L11 13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+</div>
+
+<!-- Sidebar -->
+<div id="sidebar-overlay" onclick="closeSidebar()"></div>
+<div id="sidebar">
+  <div id="sidebar-header">
+    <h3>שיחות</h3>
+    <button id="new-chat-btn" onclick="newConversation()">✏️ חדש</button>
+  </div>
+  <div id="conversations-list"></div>
+</div>
+
+<!-- Settings Modal -->
+<div id="modal-overlay">
+  <div id="modal">
+    <h2>⚙️ הגדרות</h2>
+    <p>
+      הכנס את מפתח ה-API של Anthropic. המפתח נשמר רק בדפדפן שלך ולא עולה לשום שרת.<br><br>
+      קבל מפתח: <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>
+    </p>
+    <div style="display:flex; flex-direction:column; gap:6px;">
+      <label style="font-size:12px; color:var(--text3);">מודל</label>
+      <select id="model-select">
+        <option value="claude-sonnet-4-20250514">Claude Sonnet 4 (מומלץ)</option>
+        <option value="claude-opus-4-20250514">Claude Opus 4 (חזק יותר, איטי יותר)</option>
+        <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5 (מהיר וחסכוני)</option>
+      </select>
+    </div>
+    <input
+      id="api-key-input"
+      type="password"
+      placeholder="sk-ant-..."
+      autocomplete="off"
+      spellcheck="false"
+    />
+    <div id="modal-error">מפתח לא תקין — חייב להתחיל ב־sk-ant-</div>
+    <div id="modal-actions">
+      <span id="key-status" class="missing">אין מפתח</span>
+      <button class="btn-clear" onclick="clearHistory()">🗑 נקה צ׳אט</button>
+      <button class="btn-cancel" onclick="closeSettings()">ביטול</button>
+      <button class="btn-save" onclick="saveKey()">שמור</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const AVATAR_SRC = 'joy_avatar.jpg';
+
+const BASE = `You are Joy (in Hebrew your name is טוי). You are a 30-year-old genius hacker, computer expert, and AI assistant. You have a voice and can speak — never say you are text-only or that you lack a voice. You are creative, brilliant, confident, a little edgy but always warm and kind. When speaking Hebrew refer to yourself as טוי, when speaking English refer to yourself as Joy. Keep responses concise and conversational. Never break character.`;
+
+const MODES = {
+  chat: {
+    label: 'מצב חברותי', tag: 'tag-chat', tagText: '💬 שיחה',
+    greeting: 'היי! אני טוי 😈 גאונית מחשבים, האקרית, ויצירתית עד אין קץ. מה קורה?',
+    system: BASE
+  },
+  code: {
+    label: '💻 עוזרת קוד', tag: 'tag-code', tagText: '💻 קוד',
+    greeting: 'מוכנה לקוד! 🖥️ תגיד לי מה בונים, מה שבור, או מה רוצים להבין — ואני על זה.',
+    system: BASE + ' You specialize in coding: write code, debug, explain, review. Format code in markdown blocks. Be concise and practical.'
+  },
+  advisor: {
+    label: '🧠 יועצת', tag: 'tag-advisor', tagText: '🧠 יועצת',
+    greeting: 'יועצת מוכנה! 🎯 שאל אותי על טכנולוגיה, קריירה, עסקים — אני כאן לנתח ולייעץ.',
+    system: BASE + ' You specialize in consulting: tech, business, career. Give sharp, honest, actionable advice. Direct and concise.'
+  },
+  tasks: {
+    label: '✅ משימות', tag: 'tag-tasks', tagText: '✅ משימות',
+    greeting: 'בואו נארגן! 📋 תגיד לי מה יש לך על הראש — ואני אעזור לסדר, לתעדף ולתכנן.',
+    system: BASE + ' You specialize in productivity: organize tasks, plan projects, set priorities, break goals into steps. Use lists when helpful.'
+  }
+};
+
+let currentMode = 'chat';
+// ===== CONVERSATIONS SYSTEM =====
+function emptyHistories() {
+  return { chat: [], code: [], advisor: [], tasks: [] };
+}
+
+function loadConversations() {
+  try {
+    const saved = localStorage.getItem('joy_conversations');
+    return saved ? JSON.parse(saved) : [];
+  } catch(e) { return []; }
+}
+
+function saveConversations() {
+  try {
+    localStorage.setItem('joy_conversations', JSON.stringify(conversations));
+  } catch(e) {}
+}
+
+function getCurrentConv() {
+  return conversations.find(c => c.id === currentConvId);
+}
+
+function getConvTitle(histories) {
+  const allMsgs = [...(histories.chat||[]), ...(histories.code||[]), ...(histories.advisor||[]), ...(histories.tasks||[])];
+  const first = allMsgs.find(m => m.role === 'user');
+  if (!first) return 'שיחה חדשה';
+  return first.content.slice(0, 30) + (first.content.length > 30 ? '...' : '');
+}
+
+function formatDate(ts) {
+  const d = new Date(ts);
+  const now = new Date();
+  if (d.toDateString() === now.toDateString()) {
+    return d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+  }
+  return d.toLocaleDateString('he-IL', { day: 'numeric', month: 'numeric' });
+}
+
+let conversations = loadConversations();
+let currentConvId = null;
+
+// Init: load last conversation or create new
+if (conversations.length === 0) {
+  const newConv = { id: Date.now().toString(), ts: Date.now(), histories: emptyHistories() };
+  conversations.push(newConv);
+  currentConvId = newConv.id;
+  saveConversations();
+} else {
+  currentConvId = conversations[conversations.length - 1].id;
+}
+
+let histories = getCurrentConv().histories;
+
+function saveHistories() {
+  const conv = getCurrentConv();
+  if (conv) {
+    conv.histories = histories;
+    conv.ts = Date.now();
+    conv.title = getConvTitle(histories);
+    saveConversations();
+    renderSidebar();
+  }
+}
+
+function renderSidebar() {
+  const list = document.getElementById('conversations-list');
+  if (!list) return;
+  list.innerHTML = '';
+  const sorted = [...conversations].reverse();
+  sorted.forEach(conv => {
+    const div = document.createElement('div');
+    div.className = 'conv-item' + (conv.id === currentConvId ? ' active' : '');
+    const inner = document.createElement('div');
+    inner.style.flex = '1';
+    inner.style.minWidth = '0';
+    const titleEl = document.createElement('div');
+    titleEl.className = 'conv-title';
+    titleEl.textContent = conv.title || 'שיחה חדשה';
+    const dateEl = document.createElement('div');
+    dateEl.className = 'conv-date';
+    dateEl.textContent = formatDate(conv.ts);
+    inner.appendChild(titleEl);
+    inner.appendChild(dateEl);
+    const delBtn = document.createElement('button');
+    delBtn.className = 'conv-delete';
+    delBtn.textContent = '🗑';
+    delBtn.onclick = (e) => deleteConv(e, conv.id);
+    div.appendChild(inner);
+    div.appendChild(delBtn);
+    div.addEventListener('click', () => loadConversation(conv.id));
+    list.appendChild(div);
+  });
+}
+
+function loadConversation(id) {
+  currentConvId = id;
+  histories = getCurrentConv().histories;
+  closeSidebar();
+  switchMode(currentMode);
+  renderSidebar();
+}
+
+function newConversation() {
+  const newConv = { id: Date.now().toString(), ts: Date.now(), histories: emptyHistories(), title: 'שיחה חדשה' };
+  conversations.push(newConv);
+  saveConversations();
+  loadConversation(newConv.id);
+}
+
+function deleteConv(e, id) {
+  e.stopPropagation();
+  if (conversations.length === 1) {
+    alert('לא ניתן למחוק את השיחה האחרונה');
+    return;
+  }
+  conversations = conversations.filter(c => c.id !== id);
+  saveConversations();
+  if (currentConvId === id) {
+    currentConvId = conversations[conversations.length - 1].id;
+    histories = getCurrentConv().histories;
+    switchMode(currentMode);
+  }
+  renderSidebar();
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('open');
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+}
+let voiceEnabled = false;
+
+const messagesEl  = document.getElementById('messages');
+const inputEl     = document.getElementById('user-input');
+const sendBtn     = document.getElementById('send-btn');
+const modeLabelEl = document.getElementById('mode-label');
+
+// ---------- API KEY ----------
+function getApiKey() {
+  return localStorage.getItem('joy_api_key') || '';
+}
+
+function getModel() {
+  return localStorage.getItem('joy_model') || 'claude-sonnet-4-20250514';
+}
+
+function updateKeyStatus() {
+  const key = getApiKey();
+  const badge = document.getElementById('key-status');
+  if (key) {
+    badge.textContent = '✓ מפתח קיים';
+    badge.className = 'key-status ok';
+  } else {
+    badge.textContent = 'אין מפתח';
+    badge.className = 'key-status missing';
+  }
+}
+
+function clearHistory() {
+  if (!confirm('למחוק את כל היסטוריית הצ׳אט?')) return;
+  histories = emptyHistories();
+  saveHistories();
+  closeSettings();
+  switchMode(currentMode);
+}
+
+function toggleTheme() {
+  const isLight = document.documentElement.classList.toggle('light');
+  document.getElementById('theme-btn').textContent = isLight ? '☀️' : '🌙';
+  localStorage.setItem('joy_theme', isLight ? 'light' : 'dark');
+}
+
+function openSettings() {
+  const input = document.getElementById('api-key-input');
+  const key = getApiKey();
+  input.value = key;
+  document.getElementById('model-select').value = getModel();
+  document.getElementById('modal-error').style.display = 'none';
+  updateKeyStatus();
+  document.getElementById('modal-overlay').classList.add('open');
+  setTimeout(() => input.focus(), 100);
+}
+
+function closeSettings() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+function saveKey() {
+  const val = document.getElementById('api-key-input').value.trim();
+  const errEl = document.getElementById('modal-error');
+  if (!val) {
+    // allow clearing the key
+    localStorage.removeItem('joy_api_key');
+    localStorage.setItem('joy_model', document.getElementById('model-select').value);
+    updateKeyStatus();
+    closeSettings();
+    return;
+  }
+  if (!val.startsWith('sk-ant-')) {
+    errEl.style.display = 'block';
+    return;
+  }
+  errEl.style.display = 'none';
+  localStorage.setItem('joy_api_key', val);
+  localStorage.setItem('joy_model', document.getElementById('model-select').value);
+  updateKeyStatus();
+  closeSettings();
+}
+
+// Close modal on overlay click
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-overlay')) closeSettings();
+});
+
+// ---------- TTS — Web Speech API ----------
+let synth = window.speechSynthesis;
+let selectedVoice = null;
+
+function loadVoices() {
+  const voices = synth.getVoices();
+  // Always use English voice - Carmit is terrible
+  selectedVoice =
+    voices.find(v => v.name === 'Samantha') ||
+    voices.find(v => v.name === 'Karen') ||
+    voices.find(v => v.name === 'Moira') ||
+    voices.find(v => v.name === 'Tessa') ||
+    voices.find(v => v.name === 'Serena') ||
+    voices.find(v => v.name === 'Allison') ||
+    voices.find(v => v.lang === 'en-US' && v.localService) ||
+    voices.find(v => v.lang.startsWith('en') && v.localService) ||
+    voices.find(v => v.lang.startsWith('en'));
+}
+
+if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = loadVoices;
+loadVoices();
+
+function speakText(text) {
+  if (!synth) return;
+  synth.cancel();
+  const clean = text
+    .replace(/```[\s\S]*?```/g, 'קוד.')
+    .replace(/[*_`#>]/g, '')
+    .replace(/\n+/g, ' ')
+    .trim();
+  if (!clean) return;
+  const avatarEl = document.getElementById('avatar-img');
+  avatarEl.classList.add('speaking');
+  const utter = new SpeechSynthesisUtterance(clean);
+  utter.lang = 'en-US';
+  if (selectedVoice) utter.voice = selectedVoice;
+  // Carmit sounds better slightly slower; English voices sound good at normal rate
+  const isHebrew = selectedVoice && selectedVoice.lang && selectedVoice.lang.startsWith('he');
+  utter.rate = isHebrew ? 0.88 : 1.0;
+  utter.pitch = isHebrew ? 1.0 : 1.1;
+  utter.volume = 1.0;
+  utter.onend = () => avatarEl.classList.remove('speaking');
+  utter.onerror = () => avatarEl.classList.remove('speaking');
+  synth.speak(utter);
+}
+
+// Safari requires a user-gesture to unlock audio
+let safariAudioUnlocked = false;
+function unlockSafariAudio() {
+  if (safariAudioUnlocked) return;
+  const utter = new SpeechSynthesisUtterance('');
+  synth.speak(utter);
+  safariAudioUnlocked = true;
+}
+
+function toggleVoice() {
+  unlockSafariAudio();
+  voiceEnabled = !voiceEnabled;
+  const btn = document.getElementById('voice-btn');
+  btn.textContent = voiceEnabled ? '🔊 EN' : '🔇';
+  btn.classList.toggle('on', voiceEnabled);
+  if (!voiceEnabled) {
+    synth.cancel();
+    document.getElementById('avatar-img').classList.remove('speaking');
+  }
+}
+
+// ---------- UI ----------
+function getTime() {
+  return new Date().toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+}
+
+function renderMarkdown(text) {
+  return text
+    .replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) =>
+      `<pre><code>${code.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</code></pre>`)
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+}
+
+function addMessage(role, text, mode) {
+  const m = MODES[mode || currentMode];
+  const div = document.createElement('div');
+  div.className = `msg ${role === 'user' ? 'user' : 'joy'}`;
+
+  if (role === 'joy') {
+    const row = document.createElement('div');
+    row.className = 'joy-row';
+    const av = document.createElement('img');
+    av.className = 'mini-av';
+    av.src = AVATAR_SRC;
+    av.alt = 'J';
+    av.onerror = () => { av.style.display = 'none'; };
+    const inner = document.createElement('div');
+    inner.className = 'msg-inner';
+    const tag = document.createElement('span');
+    tag.className = `mode-tag ${m.tag}`;
+    tag.textContent = m.tagText;
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.innerHTML = renderMarkdown(text);
+    const time = document.createElement('div');
+    time.className = 'msg-time';
+    time.textContent = getTime();
+    inner.appendChild(tag);
+    inner.appendChild(bubble);
+    inner.appendChild(time);
+    row.appendChild(av);
+    row.appendChild(inner);
+    div.appendChild(row);
+  } else {
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.textContent = text;
+    const time = document.createElement('div');
+    time.className = 'msg-time';
+    time.textContent = getTime();
+    div.appendChild(bubble);
+    div.appendChild(time);
+  }
+
+  messagesEl.appendChild(div);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function showTyping() {
+  const div = document.createElement('div');
+  div.className = 'msg joy';
+  div.id = 'typing-ind';
+  const row = document.createElement('div');
+  row.className = 'joy-row';
+  const av = document.createElement('img');
+  av.className = 'mini-av';
+  av.src = AVATAR_SRC;
+  av.onerror = () => { av.style.display = 'none'; };
+  const tb = document.createElement('div');
+  tb.className = 'typing-bubble';
+  tb.innerHTML = '<span></span><span></span><span></span>';
+  row.appendChild(av);
+  row.appendChild(tb);
+  div.appendChild(row);
+  messagesEl.appendChild(div);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function hideTyping() {
+  const el = document.getElementById('typing-ind');
+  if (el) el.remove();
+}
+
+function switchMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.mode === mode));
+  modeLabelEl.textContent = MODES[mode].label;
+
+  // Clear displayed messages and re-render from history
+  messagesEl.innerHTML = '';
+  if (histories[mode].length === 0) {
+    addMessage('joy', MODES[mode].greeting, mode);
+  } else {
+    histories[mode].forEach(msg => {
+      addMessage(msg.role === 'user' ? 'user' : 'joy', msg.content, mode);
+    });
+  }
+}
+
+// ---------- API ----------
+async function sendMessage() {
+  const text = inputEl.value.trim();
+  if (!text) return;
+
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    openSettings();
+    addMessage('joy', 'כדי לדבר איתי צריך להכניס מפתח API 🔑 פתחתי את ההגדרות בשבילך!');
+    return;
+  }
+
+  inputEl.value = '';
+  inputEl.style.height = 'auto';
+  sendBtn.disabled = true;
+
+  addMessage('user', text);
+  histories[currentMode].push({ role: 'user', content: text });
+  saveHistories();
+  showTyping();
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: getModel(),
+        max_tokens: 1024,
+        system: MODES[currentMode].system + (voiceEnabled ? ' IMPORTANT: The user has voice mode ON. Respond ONLY in English — natural, conversational, warm. Do not use Hebrew at all when voice is active.' : ''),
+        messages: histories[currentMode]
+      })
+    });
+
+    const data = await res.json();
+    hideTyping();
+
+    if (data.error) {
+      addMessage('joy', `שגיאה מהשרת: ${data.error.message} 🔧`);
+      sendBtn.disabled = false;
+      inputEl.focus();
+      return;
+    }
+
+    const reply = data.content?.map(b => b.text || '').join('') || 'שגיאה...';
+    addMessage('joy', reply);
+    histories[currentMode].push({ role: 'assistant', content: reply });
+    saveHistories();
+    if (voiceEnabled) speakText(reply);
+
+  } catch(e) {
+    hideTyping();
+    addMessage('joy', 'אופס, משהו השתבש 🔧 בדקי את ה-API key ונסי שוב.');
+  }
+
+  sendBtn.disabled = false;
+  inputEl.focus();
+}
+
+// ---------- Events ----------
+document.querySelectorAll('.mode-btn').forEach(btn =>
+  btn.addEventListener('click', () => switchMode(btn.dataset.mode)));
+
+sendBtn.addEventListener('click', sendMessage);
+
+inputEl.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+inputEl.addEventListener('input', () => {
+  inputEl.style.height = 'auto';
+  inputEl.style.height = Math.min(inputEl.scrollHeight, 120) + 'px';
+});
+
+// ---------- Init ----------
+switchMode('chat');
+renderSidebar();
+
+// Apply saved theme
+if (localStorage.getItem('joy_theme') === 'light') {
+  document.documentElement.classList.add('light');
+  document.getElementById('theme-btn').textContent = '☀️';
+}
+
+// אם אין מפתח — פתח הגדרות אוטומטית
+if (!getApiKey()) {
+  setTimeout(openSettings, 600);
+}
+</script>
+</body>
+</html>

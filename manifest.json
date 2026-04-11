@@ -2,7 +2,7 @@
   "name": "Joy - עוזרת חכמה",
   "short_name": "Joy",
   "description": "Joy - גאונית מחשבים, האקרית ויועצת אישית",
-  "start_url": "/joy.html",
+  "start_url": "/joy/joy.html",
   "display": "standalone",
   "background_color": "#0f0f1a",
   "theme_color": "#534AB7",
